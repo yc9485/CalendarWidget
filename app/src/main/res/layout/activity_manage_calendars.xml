@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tvManageTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/manage_calendars"
+        android:textColor="@color/day_text_primary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvManageSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/day_text_muted"
+        android:textSize="11sp" />
+
+    <CheckBox
+        android:id="@+id/cbManageChina"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp" />
+
+    <CheckBox
+        android:id="@+id/cbManageSweden"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnManageRemoveSelected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="40dp"
+        android:minWidth="0dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:text="@string/remove_selected_calendars"
+        android:textAllCaps="false"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp"
+        app:backgroundTint="#FFE5E7EB"
+        app:cornerRadius="8dp"
+        app:rippleColor="#220F172A"
+        app:strokeColor="#FFD1D5DB"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnManageClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:minHeight="40dp"
+        android:minWidth="0dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:text="@string/close"
+        android:textAllCaps="false"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp"
+        app:backgroundTint="#FFE5E7EB"
+        app:cornerRadius="8dp"
+        app:rippleColor="#220F172A"
+        app:strokeColor="#FFD1D5DB"
+        app:strokeWidth="1dp" />
+</LinearLayout>

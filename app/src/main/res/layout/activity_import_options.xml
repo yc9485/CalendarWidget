@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_background"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tvImportOptionsTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/import_options"
+        android:textColor="@color/day_text_primary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImportManual"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="40dp"
+        android:minWidth="0dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:text="@string/manual_upload"
+        android:textAllCaps="false"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp"
+        app:backgroundTint="#FFE5E7EB"
+        app:cornerRadius="8dp"
+        app:rippleColor="#220F172A"
+        app:strokeColor="#FFD1D5DB"
+        app:strokeWidth="1dp" />
+
+    <CheckBox
+        android:id="@+id/cbImportChina"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/china_holidays_current_year"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp" />
+
+    <CheckBox
+        android:id="@+id/cbImportSweden"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="@string/sweden_red_days_current_year"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImportSelectedHolidays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:minHeight="40dp"
+        android:minWidth="0dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:text="@string/import_selected_holidays"
+        android:textAllCaps="false"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp"
+        app:backgroundTint="#FFE5E7EB"
+        app:cornerRadius="8dp"
+        app:rippleColor="#220F172A"
+        app:strokeColor="#FFD1D5DB"
+        app:strokeWidth="1dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImportOptionsCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:minHeight="40dp"
+        android:minWidth="0dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:text="@string/close"
+        android:textAllCaps="false"
+        android:textColor="@color/day_text_primary"
+        android:textSize="12sp"
+        app:backgroundTint="#FFE5E7EB"
+        app:cornerRadius="8dp"
+        app:rippleColor="#220F172A"
+        app:strokeColor="#FFD1D5DB"
+        app:strokeWidth="1dp" />
+</LinearLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.WidgetCalendar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#FFFFFFFF</item>
+    </style>
+
+    <style name="Theme.WidgetCalendar.Dialog" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">94%</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+</resources>

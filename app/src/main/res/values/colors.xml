@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_background">#FFF8FAFC</color>
+    <color name="day_text_primary">#FF0F172A</color>
+    <color name="day_text_muted">#FF64748B</color>
+    <color name="reminder_text">#FF1D4ED8</color>
+    <color name="task_chip_text">#FFFFFFFF</color>
+    <color name="task_chip_text_completed">#FF334155</color>
+    <color name="day_background_current_month">#FFFFFFFF</color>
+    <color name="day_background_other_month">#FFE2E8F0</color>
+    <color name="today_background">#FFBAE6FD</color>
+</resources>

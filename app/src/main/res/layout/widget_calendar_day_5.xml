@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dayContainer"
+    android:layout_width="match_parent"
+    android:layout_height="59dp"
+    android:gravity="top|start"
+    android:orientation="vertical"
+    android:padding="0dp">
+
+    <TextView
+        android:id="@+id/tvDayNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="2dp"
+        android:paddingTop="1dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/day_text_primary"
+        android:textSize="9sp"
+        android:textStyle="bold" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_marginTop="1dp"
+        android:padding="0dp">
+
+        <ImageView
+            android:id="@+id/ivTask1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTask1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingHorizontal="0dp"
+            android:paddingVertical="0dp"
+            android:textColor="@color/task_chip_text"
+            android:textSize="8sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_marginTop="1dp"
+        android:padding="0dp">
+
+        <ImageView
+            android:id="@+id/ivTask2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTask2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingHorizontal="0dp"
+            android:paddingVertical="0dp"
+            android:textColor="@color/task_chip_text"
+            android:textSize="8sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        android:layout_marginTop="1dp"
+        android:padding="0dp">
+
+        <ImageView
+            android:id="@+id/ivTask3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvTask3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="start|center_vertical"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingHorizontal="0dp"
+            android:paddingVertical="0dp"
+            android:textColor="@color/task_chip_text"
+            android:textSize="8sp" />
+    </FrameLayout>
+</LinearLayout>
