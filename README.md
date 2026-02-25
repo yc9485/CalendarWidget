@@ -16,7 +16,6 @@ Tap a date to manage reminders/todos and the brief status appears on each date c
 You can build/install from terminal with the script in repo root:
 
 ```powershell
-cd F:\chenyang
 .\build_and_install.ps1 -JavaHome "C:\Java\jdk-17" -AndroidHome "$env:LOCALAPPDATA\Android\Sdk"
 ```
 
