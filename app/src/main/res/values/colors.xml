@@ -6,6 +6,9 @@
     <color name="reminder_text">#FF1D4ED8</color>
     <color name="task_chip_text">#FFFFFFFF</color>
     <color name="task_chip_text_completed">#FF334155</color>
+    <color name="action_button_bg">#FF5C6BC0</color>
+    <color name="action_button_text">#FFFFFFFF</color>
+    <color name="action_button_stroke">#FF4A58A8</color>
     <color name="day_background_current_month">#FFFFFFFF</color>
     <color name="day_background_other_month">#FFE2E8F0</color>
     <color name="today_background">#FFBAE6FD</color>

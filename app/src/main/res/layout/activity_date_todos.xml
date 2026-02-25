@@ -52,8 +52,10 @@
             android:id="@+id/btnAddTodo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/action_button_bg"
             android:text="@string/add_item"
             android:textAllCaps="false"
+            android:textColor="@color/action_button_text"
             android:textSize="11sp" />
 
         <Button
@@ -61,8 +63,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:backgroundTint="@color/action_button_bg"
             android:text="@string/close"
             android:textAllCaps="false"
+            android:textColor="@color/action_button_text"
             android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

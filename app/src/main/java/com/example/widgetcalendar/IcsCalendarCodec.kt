@@ -43,6 +43,18 @@ object IcsCalendarCodec {
             if (item.sourceTag.isNotBlank()) {
                 builder.append("X-WIDGET-SOURCE:${escapeText(item.sourceTag)}\r\n")
             }
+            builder.append("PRIORITY:${toIcsPriority(item.priority)}\r\n")
+            builder.append("X-WIDGET-PRIORITY:${item.priority}\r\n")
+
+            val recurrence = normalizeRecurrence(item.recurrence)
+            if (recurrence != RECURRENCE_NONE) {
+                builder.append("RRULE:${buildRRule(recurrence, item.recurrenceUntilMillis)}\r\n")
+                builder.append("X-WIDGET-RECURRENCE:${recurrence}\r\n")
+                val until = CalendarRepository.dayStart(item.recurrenceUntilMillis)
+                if (until > 0L) {
+                    builder.append("X-WIDGET-RECURRENCE-UNTIL:${dateOnly.format(until)}\r\n")
+                }
+            }
 
             if (item.hasTime && item.startMinute in 0..1439 && item.endMinute in 0..1439) {
                 val startMs = startDay + item.startMinute * 60_000L
@@ -96,6 +108,9 @@ object IcsCalendarCodec {
         val status = props.firstOrNull { it.name == "STATUS" }?.value.orEmpty().uppercase(Locale.US)
         val completed = status == "COMPLETED"
         val sourceTag = props.firstOrNull { it.name == "X-WIDGET-SOURCE" }?.value?.let(::unescapeText).orEmpty()
+        val priority = parsePriority(props)
+        val recurrence = parseRecurrence(props)
+        val recurrenceUntilMillis = parseRecurrenceUntil(props)
 
         val dtStart = props.firstOrNull { it.name == "DTSTART" } ?: return null
         val dtEnd = props.firstOrNull { it.name == "DTEND" }
@@ -115,7 +130,10 @@ object IcsCalendarCodec {
                 startMinute = -1,
                 endMinute = -1,
                 completed = completed,
-                sourceTag = sourceTag
+                sourceTag = sourceTag,
+                priority = priority,
+                recurrence = recurrence,
+                recurrenceUntilMillis = recurrenceUntilMillis
             )
         } else {
             val startMs = parseDateTime(dtStart.value) ?: return null
@@ -131,7 +149,10 @@ object IcsCalendarCodec {
                 startMinute = startCal.get(Calendar.HOUR_OF_DAY) * 60 + startCal.get(Calendar.MINUTE),
                 endMinute = endCal.get(Calendar.HOUR_OF_DAY) * 60 + endCal.get(Calendar.MINUTE),
                 completed = completed,
-                sourceTag = sourceTag
+                sourceTag = sourceTag,
+                priority = priority,
+                recurrence = recurrence,
+                recurrenceUntilMillis = recurrenceUntilMillis
             )
         }
     }
@@ -196,6 +217,87 @@ object IcsCalendarCodec {
             .replace("\\,", ",")
             .replace("\\;", ";")
             .replace("\\\\", "\\")
+    }
+
+    private fun toIcsPriority(priority: Int): Int {
+        return when (priority) {
+            PRIORITY_HIGH -> 1
+            PRIORITY_LOW -> 9
+            else -> 5
+        }
+    }
+
+    private fun parsePriority(props: List<PropertyLine>): Int {
+        val custom = props.firstOrNull { it.name == "X-WIDGET-PRIORITY" }?.value?.toIntOrNull()
+        if (custom != null) return custom
+
+        return when (props.firstOrNull { it.name == "PRIORITY" }?.value?.toIntOrNull()) {
+            null -> PRIORITY_NORMAL
+            in 1..3 -> PRIORITY_HIGH
+            in 7..9 -> PRIORITY_LOW
+            else -> PRIORITY_NORMAL
+        }
+    }
+
+    private fun parseRecurrence(props: List<PropertyLine>): String {
+        val custom = props.firstOrNull { it.name == "X-WIDGET-RECURRENCE" }
+            ?.value
+            ?.let(::unescapeText)
+            ?.uppercase(Locale.US)
+            .orEmpty()
+        if (custom in RECURRENCE_TYPES) return custom
+
+        val rrule = props.firstOrNull { it.name == "RRULE" }?.value.orEmpty()
+        val freq = rrule.split(';')
+            .firstOrNull { it.startsWith("FREQ=", ignoreCase = true) }
+            ?.substringAfter('=')
+            ?.uppercase(Locale.US)
+            .orEmpty()
+        return normalizeRecurrence(freq)
+    }
+
+    private fun parseRecurrenceUntil(props: List<PropertyLine>): Long {
+        val custom = props.firstOrNull { it.name == "X-WIDGET-RECURRENCE-UNTIL" }
+            ?.value
+            ?.let(::parseFlexibleDate)
+        if (custom != null) return custom
+
+        val untilRaw = props.firstOrNull { it.name == "RRULE" }?.value.orEmpty()
+            .split(';')
+            .firstOrNull { it.startsWith("UNTIL=", ignoreCase = true) }
+            ?.substringAfter('=')
+            ?: return 0L
+        return parseFlexibleDate(untilRaw) ?: 0L
+    }
+
+    private fun parseFlexibleDate(value: String): Long? {
+        return when {
+            value.length == 8 -> parseDateOnly(value)
+            value.endsWith("Z") -> parseDateTime(value)
+            value.contains("T") -> parseDateTime(value)
+            else -> null
+        }?.let(CalendarRepository::dayStart)
+    }
+
+    private fun buildRRule(recurrence: String, recurrenceUntilMillis: Long): String {
+        val freq = when (recurrence) {
+            RECURRENCE_DAILY -> "DAILY"
+            RECURRENCE_WEEKLY -> "WEEKLY"
+            RECURRENCE_MONTHLY -> "MONTHLY"
+            RECURRENCE_YEARLY -> "YEARLY"
+            else -> "DAILY"
+        }
+        val until = CalendarRepository.dayStart(recurrenceUntilMillis)
+        return if (until > 0L) {
+            "FREQ=$freq;UNTIL=${dateOnly.format(until)}"
+        } else {
+            "FREQ=$freq"
+        }
+    }
+
+    private fun normalizeRecurrence(value: String): String {
+        val normalized = value.trim().uppercase(Locale.US)
+        return if (normalized in RECURRENCE_TYPES) normalized else RECURRENCE_NONE
     }
 }
 

@@ -6,10 +6,15 @@ import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.widget.ArrayAdapter
+import android.widget.AdapterView
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,19 +33,35 @@ class EditTodoItemActivity : AppCompatActivity() {
     private var endDateMillis: Long = 0L
     private var startMinute: Int = 9 * 60
     private var endMinute: Int = 10 * 60
+    private var selectedPriority: Int = PRIORITY_NORMAL
+    private var selectedRecurrence: String = RECURRENCE_NONE
+    private var recurrenceUntilMillis: Long = 0L
 
     private lateinit var tvDialogTitle: TextView
     private lateinit var etTitle: EditText
     private lateinit var btnStartDate: Button
     private lateinit var btnEndDate: Button
+    private lateinit var spPriority: Spinner
+    private lateinit var spRecurrence: Spinner
+    private lateinit var btnRecurrenceUntil: Button
     private lateinit var cbHasTime: CheckBox
     private lateinit var timeContainer: View
     private lateinit var btnStartTime: Button
     private lateinit var btnEndTime: Button
     private lateinit var btnDelete: Button
 
+    private val priorityValues = listOf(PRIORITY_NORMAL, PRIORITY_HIGH, PRIORITY_LOW)
+    private val recurrenceValues = listOf(
+        RECURRENCE_NONE,
+        RECURRENCE_DAILY,
+        RECURRENCE_WEEKLY,
+        RECURRENCE_MONTHLY,
+        RECURRENCE_YEARLY
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_edit_todo_item)
 
         appWidgetId = intent.getIntExtra(
@@ -53,6 +74,9 @@ class EditTodoItemActivity : AppCompatActivity() {
         etTitle = findViewById(R.id.etTitle)
         btnStartDate = findViewById(R.id.btnStartDate)
         btnEndDate = findViewById(R.id.btnEndDate)
+        spPriority = findViewById(R.id.spPriority)
+        spRecurrence = findViewById(R.id.spRecurrence)
+        btnRecurrenceUntil = findViewById(R.id.btnRecurrenceUntil)
         cbHasTime = findViewById(R.id.cbHasTime)
         timeContainer = findViewById(R.id.timeContainer)
         btnStartTime = findViewById(R.id.btnStartTime)
@@ -61,6 +85,7 @@ class EditTodoItemActivity : AppCompatActivity() {
         val btnSave = findViewById<Button>(R.id.btnSave)
         val btnCancel = findViewById<Button>(R.id.btnCancel)
 
+        bindSelectors()
         initializeState()
         bindStateToViews()
 
@@ -99,6 +124,19 @@ class EditTodoItemActivity : AppCompatActivity() {
             }
         }
 
+        btnRecurrenceUntil.setOnClickListener {
+            val initial = if (recurrenceUntilMillis > 0L) recurrenceUntilMillis else endDateMillis
+            pickDate(initial) { picked ->
+                recurrenceUntilMillis = picked
+                bindStateToViews()
+            }
+        }
+        btnRecurrenceUntil.setOnLongClickListener {
+            recurrenceUntilMillis = 0L
+            bindStateToViews()
+            true
+        }
+
         btnSave.setOnClickListener {
             saveItem()
         }
@@ -135,6 +173,9 @@ class EditTodoItemActivity : AppCompatActivity() {
         endDateMillis = CalendarRepository.dayStart(existing.endDateMillis)
         startMinute = if (existing.startMinute in 0..1439) existing.startMinute else startMinute
         endMinute = if (existing.endMinute in 0..1439) existing.endMinute else endMinute
+        selectedPriority = existing.priority
+        selectedRecurrence = existing.recurrence
+        recurrenceUntilMillis = existing.recurrenceUntilMillis
         existingCompleted = existing.completed
         existingSourceTag = existing.sourceTag
         etTitle.setText(existing.title)
@@ -150,6 +191,29 @@ class EditTodoItemActivity : AppCompatActivity() {
 
         btnStartDate.text = CalendarRepository.formatDateButton(startDateMillis)
         btnEndDate.text = CalendarRepository.formatDateButton(endDateMillis)
+
+        val priorityIndex = priorityValues.indexOf(selectedPriority).coerceAtLeast(0)
+        if (spPriority.selectedItemPosition != priorityIndex) {
+            spPriority.setSelection(priorityIndex, false)
+        }
+        val recurrenceIndex = recurrenceValues.indexOf(selectedRecurrence).coerceAtLeast(0)
+        if (spRecurrence.selectedItemPosition != recurrenceIndex) {
+            spRecurrence.setSelection(recurrenceIndex, false)
+        }
+
+        if (selectedRecurrence == RECURRENCE_NONE) {
+            btnRecurrenceUntil.visibility = GONE
+        } else {
+            btnRecurrenceUntil.visibility = VISIBLE
+            btnRecurrenceUntil.text = if (recurrenceUntilMillis > 0L) {
+                getString(
+                    R.string.repeat_until_date,
+                    CalendarRepository.formatDateButton(recurrenceUntilMillis)
+                )
+            } else {
+                getString(R.string.repeat_until_none)
+            }
+        }
 
         timeContainer.visibility = if (cbHasTime.isChecked) View.VISIBLE else View.GONE
         btnStartTime.text = CalendarRepository.formatMinute(startMinute)
@@ -170,6 +234,14 @@ class EditTodoItemActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.invalid_time_range, Toast.LENGTH_SHORT).show()
             return
         }
+        if (
+            selectedRecurrence != RECURRENCE_NONE &&
+            recurrenceUntilMillis > 0L &&
+            CalendarRepository.dayStart(recurrenceUntilMillis) < CalendarRepository.dayStart(startDateMillis)
+        ) {
+            Toast.makeText(this, R.string.invalid_recurrence_until, Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val item = TodoItem(
             id = todoId ?: UUID.randomUUID().toString(),
@@ -180,7 +252,14 @@ class EditTodoItemActivity : AppCompatActivity() {
             startMinute = startMinute,
             endMinute = endMinute,
             completed = existingCompleted,
-            sourceTag = existingSourceTag
+            sourceTag = existingSourceTag,
+            priority = selectedPriority,
+            recurrence = selectedRecurrence,
+            recurrenceUntilMillis = if (selectedRecurrence == RECURRENCE_NONE) {
+                0L
+            } else {
+                recurrenceUntilMillis
+            }
         )
 
         CalendarRepository.upsertTodoItem(this, item)
@@ -256,4 +335,53 @@ class EditTodoItemActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_TODO_ID = "extra_todo_id"
     }
+
+    private fun bindSelectors() {
+        val priorityLabels = listOf(
+            getString(R.string.priority_normal),
+            getString(R.string.priority_high),
+            getString(R.string.priority_low)
+        )
+        spPriority.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            priorityLabels
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        spPriority.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedPriority = priorityValues.getOrElse(position) { PRIORITY_NORMAL }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+
+        val recurrenceLabels = listOf(
+            getString(R.string.repeat_none),
+            getString(R.string.repeat_daily),
+            getString(R.string.repeat_weekly),
+            getString(R.string.repeat_monthly),
+            getString(R.string.repeat_yearly)
+        )
+        spRecurrence.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            recurrenceLabels
+        ).apply {
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        }
+        spRecurrence.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                selectedRecurrence = recurrenceValues.getOrElse(position) { RECURRENCE_NONE }
+                if (selectedRecurrence == RECURRENCE_NONE) {
+                    recurrenceUntilMillis = 0L
+                }
+                bindStateToViews()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+    }
 }
+

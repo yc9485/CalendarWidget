@@ -11,6 +11,8 @@ object CalendarRepository {
     private const val PREFS_NAME = "widget_calendar_prefs"
     private const val MONTH_OFFSET_PREFIX = "month_offset_"
     private const val TODO_ITEMS_KEY = "todo_items_json"
+    private const val DAY_MS = 86_400_000L
+    private const val MAX_RECURRENCE_ITERATIONS = 2000
 
     private const val MAX_TITLE_LENGTH = 60
 
@@ -92,11 +94,54 @@ object CalendarRepository {
 
     fun getTodoItemsForDate(dateMillis: Long, allItems: List<TodoItem>): List<TodoItem> {
         val targetDay = dayStart(dateMillis)
-        return allItems.filter { item ->
-            val start = dayStart(item.startDateMillis)
-            val end = dayStart(item.endDateMillis)
-            targetDay in start..end
-        }.sortedWith(todoComparator())
+        return expandItemsForRange(allItems, targetDay, targetDay)
+    }
+
+    fun expandItemsForRange(
+        items: List<TodoItem>,
+        rangeStartMillis: Long,
+        rangeEndMillis: Long
+    ): List<TodoItem> {
+        val rangeStart = dayStart(rangeStartMillis)
+        val rangeEnd = dayStart(rangeEndMillis)
+        if (rangeEnd < rangeStart) return emptyList()
+
+        val expanded = mutableListOf<TodoItem>()
+        items.forEach { raw ->
+            val item = normalizeTodoItem(raw)
+            val recurrence = normalizeRecurrence(item.recurrence)
+            if (recurrence == RECURRENCE_NONE) {
+                val start = dayStart(item.startDateMillis)
+                val end = dayStart(item.endDateMillis)
+                if (end >= rangeStart && start <= rangeEnd) {
+                    expanded += item
+                }
+                return@forEach
+            }
+
+            val durationDays = ((dayStart(item.endDateMillis) - dayStart(item.startDateMillis)) / DAY_MS)
+                .coerceAtLeast(0L)
+            val recurrenceLimit = normalizeRecurrenceUntil(item.recurrenceUntilMillis, dayStart(item.startDateMillis))
+            var occurrenceStart = dayStart(item.startDateMillis)
+            var iterations = 0
+
+            while (
+                occurrenceStart <= rangeEnd &&
+                (recurrenceLimit <= 0L || occurrenceStart <= recurrenceLimit) &&
+                iterations < MAX_RECURRENCE_ITERATIONS
+            ) {
+                val occurrenceEnd = occurrenceStart + durationDays * DAY_MS
+                if (occurrenceEnd >= rangeStart) {
+                    expanded += buildOccurrence(item, occurrenceStart, occurrenceEnd)
+                }
+                val next = nextOccurrenceStart(occurrenceStart, recurrence)
+                if (next <= occurrenceStart) break
+                occurrenceStart = next
+                iterations++
+            }
+        }
+
+        return expanded.sortedWith(todoComparator())
     }
 
     fun getTodoItemById(context: Context, itemId: String): TodoItem? {
@@ -146,6 +191,10 @@ object CalendarRepository {
         if (idx < 0) return
         mutable[idx] = mutable[idx].copy(completed = completed)
         saveTodoItems(context, mutable)
+    }
+
+    fun resolveSeriesItemId(item: TodoItem): String {
+        return item.seriesId.ifBlank { item.id }
     }
 
     data class DaySummaryLine(
@@ -228,7 +277,47 @@ object CalendarRepository {
         } else {
             "All day"
         }
-        return "$datePart | $schedulePart"
+        val priorityPart = priorityLabel(item.priority)
+        val recurrencePart = recurrenceLabel(item.recurrence, item.recurrenceUntilMillis)
+        return if (recurrencePart.isBlank()) {
+            "$datePart | $schedulePart | $priorityPart"
+        } else {
+            "$datePart | $schedulePart | $priorityPart | $recurrencePart"
+        }
+    }
+
+    fun priorityLabel(priority: Int): String {
+        return when (normalizePriority(priority)) {
+            PRIORITY_HIGH -> "High"
+            PRIORITY_LOW -> "Low"
+            else -> "Normal"
+        }
+    }
+
+    fun priorityPrefix(priority: Int): String {
+        return when (normalizePriority(priority)) {
+            PRIORITY_HIGH -> "!! "
+            PRIORITY_LOW -> "~ "
+            else -> ""
+        }
+    }
+
+    fun recurrenceLabel(recurrence: String, recurrenceUntilMillis: Long): String {
+        val type = normalizeRecurrence(recurrence)
+        if (type == RECURRENCE_NONE) return ""
+        val base = when (type) {
+            RECURRENCE_DAILY -> "Daily"
+            RECURRENCE_WEEKLY -> "Weekly"
+            RECURRENCE_MONTHLY -> "Monthly"
+            RECURRENCE_YEARLY -> "Yearly"
+            else -> "Custom"
+        }
+        val until = normalizeRecurrenceUntil(recurrenceUntilMillis, 0L)
+        return if (until > 0L) {
+            "Repeats $base until ${formatShortDate(until)}"
+        } else {
+            "Repeats $base"
+        }
     }
 
     fun dateKey(timeMillis: Long): String {
@@ -249,6 +338,12 @@ object CalendarRepository {
                     put("endMinute", item.endMinute)
                     put("completed", item.completed)
                     put("sourceTag", item.sourceTag)
+                    put("priority", normalizePriority(item.priority))
+                    put("recurrence", normalizeRecurrence(item.recurrence))
+                    put("recurrenceUntilMillis", normalizeRecurrenceUntil(
+                        item.recurrenceUntilMillis,
+                        dayStart(item.startDateMillis)
+                    ))
                 }
             )
         }
@@ -287,7 +382,10 @@ object CalendarRepository {
                         startMinute = obj.optInt("startMinute", -1),
                         endMinute = obj.optInt("endMinute", -1),
                         completed = obj.optBoolean("completed", false),
-                        sourceTag = obj.optString("sourceTag", "")
+                        sourceTag = obj.optString("sourceTag", ""),
+                        priority = obj.optInt("priority", PRIORITY_NORMAL),
+                        recurrence = obj.optString("recurrence", RECURRENCE_NONE),
+                        recurrenceUntilMillis = obj.optLong("recurrenceUntilMillis", 0L)
                     )
                 )
                 add(parsed)
@@ -315,6 +413,13 @@ object CalendarRepository {
             endMinute = tmp
         }
 
+        val recurrence = normalizeRecurrence(item.recurrence)
+        val recurrenceUntil = if (recurrence == RECURRENCE_NONE) {
+            0L
+        } else {
+            normalizeRecurrenceUntil(item.recurrenceUntilMillis, startDate)
+        }
+
         return item.copy(
             title = normalizedTitle,
             startDateMillis = startDate,
@@ -322,7 +427,12 @@ object CalendarRepository {
             hasTime = hasTime,
             startMinute = startMinute,
             endMinute = endMinute,
-            sourceTag = item.sourceTag.trim()
+            sourceTag = item.sourceTag.trim(),
+            priority = normalizePriority(item.priority),
+            recurrence = recurrence,
+            recurrenceUntilMillis = recurrenceUntil,
+            seriesId = item.seriesId.trim(),
+            generatedOccurrence = item.generatedOccurrence
         )
     }
 
@@ -336,10 +446,55 @@ object CalendarRepository {
     private fun todoComparator(): Comparator<TodoItem> {
         return compareBy<TodoItem>(
             { it.completed },
+            { -normalizePriority(it.priority) },
             { if (it.hasTime) 0 else 1 },
             { if (it.hasTime) it.startMinute else Int.MAX_VALUE },
             { it.title.lowercase(Locale.getDefault()) }
         )
+    }
+
+    private fun buildOccurrence(item: TodoItem, startDay: Long, endDay: Long): TodoItem {
+        return item.copy(
+            id = "${item.id}#${dateKey(startDay)}",
+            startDateMillis = startDay,
+            endDateMillis = endDay,
+            seriesId = item.id,
+            generatedOccurrence = true
+        )
+    }
+
+    private fun nextOccurrenceStart(currentStartDay: Long, recurrence: String): Long {
+        return when (recurrence) {
+            RECURRENCE_DAILY -> currentStartDay + DAY_MS
+            RECURRENCE_WEEKLY -> currentStartDay + DAY_MS * 7L
+            RECURRENCE_MONTHLY -> Calendar.getInstance().apply {
+                timeInMillis = currentStartDay
+                add(Calendar.MONTH, 1)
+            }.timeInMillis.let(::dayStart)
+            RECURRENCE_YEARLY -> Calendar.getInstance().apply {
+                timeInMillis = currentStartDay
+                add(Calendar.YEAR, 1)
+            }.timeInMillis.let(::dayStart)
+            else -> currentStartDay
+        }
+    }
+
+    private fun normalizePriority(value: Int): Int {
+        return when (value) {
+            PRIORITY_LOW, PRIORITY_NORMAL, PRIORITY_HIGH -> value
+            else -> PRIORITY_NORMAL
+        }
+    }
+
+    private fun normalizeRecurrence(value: String): String {
+        val normalized = value.trim().uppercase(Locale.US)
+        return if (normalized in RECURRENCE_TYPES) normalized else RECURRENCE_NONE
+    }
+
+    private fun normalizeRecurrenceUntil(value: Long, startDate: Long): Long {
+        if (value <= 0L) return 0L
+        val normalized = dayStart(value)
+        return if (startDate > 0L && normalized < startDate) startDate else normalized
     }
 
     private fun getMonthOffset(context: Context, appWidgetId: Int): Int {

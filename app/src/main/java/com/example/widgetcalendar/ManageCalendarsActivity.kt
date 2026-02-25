@@ -15,6 +15,7 @@ class ManageCalendarsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_manage_calendars)
 
         cbChina = findViewById(R.id.cbManageChina)
@@ -66,3 +67,4 @@ class ManageCalendarsActivity : AppCompatActivity() {
         tvSummary.text = getString(R.string.manage_summary_total, chinaCount + swedenCount)
     }
 }
+

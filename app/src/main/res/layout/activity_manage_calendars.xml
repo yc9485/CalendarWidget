@@ -51,12 +51,12 @@
         android:paddingBottom="7dp"
         android:text="@string/remove_selected_calendars"
         android:textAllCaps="false"
-        android:textColor="@color/day_text_primary"
+        android:textColor="@color/action_button_text"
         android:textSize="12sp"
-        app:backgroundTint="#FFE5E7EB"
+        app:backgroundTint="@color/action_button_bg"
         app:cornerRadius="8dp"
         app:rippleColor="#220F172A"
-        app:strokeColor="#FFD1D5DB"
+        app:strokeColor="@color/action_button_stroke"
         app:strokeWidth="1dp" />
 
     <com.google.android.material.button.MaterialButton
@@ -70,11 +70,11 @@
         android:paddingBottom="7dp"
         android:text="@string/close"
         android:textAllCaps="false"
-        android:textColor="@color/day_text_primary"
+        android:textColor="@color/action_button_text"
         android:textSize="12sp"
-        app:backgroundTint="#FFE5E7EB"
+        app:backgroundTint="@color/action_button_bg"
         app:cornerRadius="8dp"
         app:rippleColor="#220F172A"
-        app:strokeColor="#FFD1D5DB"
+        app:strokeColor="@color/action_button_stroke"
         app:strokeWidth="1dp" />
 </LinearLayout>

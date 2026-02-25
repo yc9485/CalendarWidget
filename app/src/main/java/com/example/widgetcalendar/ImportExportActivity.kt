@@ -60,6 +60,7 @@ class ImportExportActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         mode = intent.getStringExtra(EXTRA_MODE) ?: MODE_EXPORT
 
         if (mode == MODE_IMPORT) {
@@ -220,3 +221,4 @@ class ImportExportActivity : AppCompatActivity() {
         const val MODE_EXPORT = "export"
     }
 }
+

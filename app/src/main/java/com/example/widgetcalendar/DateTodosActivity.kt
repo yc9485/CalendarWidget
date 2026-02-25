@@ -13,6 +13,7 @@ import android.widget.CheckBox
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 
 class DateTodosActivity : AppCompatActivity() {
 
@@ -23,6 +24,7 @@ class DateTodosActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_date_todos)
 
         dateMillis = CalendarRepository.dayStart(
@@ -50,12 +52,16 @@ class DateTodosActivity : AppCompatActivity() {
         adapter = TodosAdapter(
             items = items,
             onToggleDone = { item, checked ->
-                CalendarRepository.setTodoCompleted(this, item.id, checked)
+                CalendarRepository.setTodoCompleted(
+                    this,
+                    CalendarRepository.resolveSeriesItemId(item),
+                    checked
+                )
                 reloadItems()
                 notifyWidgetChanged()
             },
             onEdit = { item ->
-                openEditor(item.id)
+                openEditor(CalendarRepository.resolveSeriesItemId(item))
             }
         )
         listTodos.adapter = adapter
@@ -127,6 +133,17 @@ private class TodosAdapter(
 
         tvTitle.text = item.title
         tvMeta.text = CalendarRepository.formatItemMeta(item)
+        tvTitle.setTextColor(
+            if (item.completed) {
+                ContextCompat.getColor(parent.context, R.color.day_text_muted)
+            } else {
+                when (item.priority) {
+                    PRIORITY_HIGH -> 0xFFB91C1C.toInt()
+                    PRIORITY_LOW -> 0xFF334155.toInt()
+                    else -> ContextCompat.getColor(parent.context, R.color.day_text_primary)
+                }
+            }
+        )
         applyStrikeThrough(tvTitle, item.completed)
         applyStrikeThrough(tvMeta, item.completed)
 
@@ -152,3 +169,4 @@ private class TodosAdapter(
         }
     }
 }
+

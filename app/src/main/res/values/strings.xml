@@ -38,6 +38,18 @@
     <string name="item_text_label">Item text</string>
     <string name="item_title_hint">Reminder or todo text</string>
     <string name="date_range_label">Date range</string>
+    <string name="priority_label">Priority</string>
+    <string name="priority_high">High</string>
+    <string name="priority_normal">Normal</string>
+    <string name="priority_low">Low</string>
+    <string name="repeat_label">Repeat</string>
+    <string name="repeat_none">Does not repeat</string>
+    <string name="repeat_daily">Every day</string>
+    <string name="repeat_weekly">Every week</string>
+    <string name="repeat_monthly">Every month</string>
+    <string name="repeat_yearly">Every year</string>
+    <string name="repeat_until_none">Repeat until: never (long-press to clear)</string>
+    <string name="repeat_until_date">Repeat until: %1$s (long-press to clear)</string>
     <string name="start_date">Start date</string>
     <string name="end_date">End date</string>
     <string name="has_time_range">Set specific time period</string>
@@ -46,6 +58,7 @@
     <string name="todo_title_required">Please enter reminder/todo text.</string>
     <string name="invalid_date_range">End date cannot be earlier than start date.</string>
     <string name="invalid_time_range">End time cannot be earlier than start time for a single-day item.</string>
+    <string name="invalid_recurrence_until">Repeat-until date cannot be earlier than start date.</string>
     <string name="export_success">Calendar exported.</string>
     <string name="export_failed">Export failed.</string>
     <string name="import_failed">Import failed.</string>

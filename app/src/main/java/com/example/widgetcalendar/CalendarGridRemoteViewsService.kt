@@ -39,6 +39,7 @@ private data class DayLine(
     val completed: Boolean,
     val spanPosition: CalendarRepository.SpanPosition,
     val isMultiDay: Boolean,
+    val priority: Int = PRIORITY_NORMAL,
     val bitmap: Bitmap? = null
 )
 
@@ -69,7 +70,7 @@ private class CalendarGridRemoteViewsFactory(
     )
     private val multiCornerRadiusPx = TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP,
-        5f,
+        4f,
         context.resources.displayMetrics
     )
     private val taskTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -163,11 +164,11 @@ private class CalendarGridRemoteViewsFactory(
         val visibleEnd = dayMillisList.last()
 
         val allItems = CalendarRepository.getAllTodoItems(context)
-        val visibleItems = allItems.filter { item ->
-            val start = CalendarRepository.dayStart(item.startDateMillis)
-            val end = CalendarRepository.dayStart(item.endDateMillis)
-            end >= visibleStart && start <= visibleEnd
-        }
+        val visibleItems = CalendarRepository.expandItemsForRange(
+            allItems,
+            visibleStart,
+            visibleEnd
+        )
 
         val multiLanePlacements = assignMultiDayLanes(visibleItems, visibleStart, totalDays)
         val multiDayCache = buildMultiDayLineCache(multiLanePlacements)
@@ -303,7 +304,8 @@ private class CalendarGridRemoteViewsFactory(
             text = "$timePrefix${item.title}",
             completed = item.completed,
             spanPosition = spanPosition,
-            isMultiDay = false
+            isMultiDay = false,
+            priority = item.priority
         )
     }
 
@@ -345,6 +347,7 @@ private class CalendarGridRemoteViewsFactory(
             completed = placement.item.completed,
             spanPosition = spanPosition,
             isMultiDay = true,
+            priority = placement.item.priority,
             bitmap = null
         )
     }
@@ -374,7 +377,8 @@ private class CalendarGridRemoteViewsFactory(
                 val bitmaps = buildMultiDaySegmentBitmaps(
                     text = segmentText,
                     totalDays = totalDays,
-                    completed = placement.item.completed
+                    completed = placement.item.completed,
+                    priority = placement.item.priority
                 )
 
                 for (offset in 0 until totalDays) {
@@ -390,6 +394,7 @@ private class CalendarGridRemoteViewsFactory(
                         completed = placement.item.completed,
                         spanPosition = spanPosition,
                         isMultiDay = true,
+                        priority = placement.item.priority,
                         bitmap = bitmaps.getOrNull(offset)
                     )
                 }
@@ -407,7 +412,8 @@ private class CalendarGridRemoteViewsFactory(
     private fun buildMultiDaySegmentBitmaps(
         text: String,
         totalDays: Int,
-        completed: Boolean
+        completed: Boolean,
+        priority: Int
     ): List<Bitmap> {
         if (totalDays <= 0) return emptyList()
 
@@ -417,7 +423,15 @@ private class CalendarGridRemoteViewsFactory(
         val canvas = Canvas(bitmap)
 
         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = if (completed) 0xFFCBD5E1.toInt() else 0xFF2563EB.toInt()
+            color = if (completed) {
+                0xFFCBD5E1.toInt()
+            } else {
+                when (priority) {
+                    PRIORITY_HIGH -> 0xFFDC2626.toInt()
+                    PRIORITY_LOW -> 0xFF64748B.toInt()
+                    else -> 0xFF5C6BC0.toInt()
+                }
+            }
             style = Paint.Style.FILL
         }
         val rect = RectF(0f, 0f, fullWidthPx.toFloat(), taskLineHeightPx.toFloat())
@@ -503,7 +517,7 @@ private class CalendarGridRemoteViewsFactory(
         views.setInt(
             textViewId,
             "setBackgroundResource",
-            backgroundFor(line.spanPosition, line.completed, line.isMultiDay)
+            backgroundFor(line.spanPosition, line.completed, line.isMultiDay, line.priority)
         )
         val (leftPad, rightPad) = if (line.isMultiDay) {
             0 to 0
@@ -521,7 +535,8 @@ private class CalendarGridRemoteViewsFactory(
     private fun backgroundFor(
         spanPosition: CalendarRepository.SpanPosition,
         completed: Boolean,
-        isMultiDay: Boolean
+        isMultiDay: Boolean,
+        priority: Int
     ): Int {
         if (isMultiDay) {
             if (completed) {
@@ -545,6 +560,22 @@ private class CalendarGridRemoteViewsFactory(
                 CalendarRepository.SpanPosition.START -> R.drawable.task_chip_done_start
                 CalendarRepository.SpanPosition.MIDDLE -> R.drawable.task_chip_done_middle
                 CalendarRepository.SpanPosition.END -> R.drawable.task_chip_done_end
+            }
+        }
+        if (priority == PRIORITY_HIGH) {
+            return when (spanPosition) {
+                CalendarRepository.SpanPosition.SINGLE -> R.drawable.task_chip_high_single
+                CalendarRepository.SpanPosition.START -> R.drawable.task_chip_high_start
+                CalendarRepository.SpanPosition.MIDDLE -> R.drawable.task_chip_high_middle
+                CalendarRepository.SpanPosition.END -> R.drawable.task_chip_high_end
+            }
+        }
+        if (priority == PRIORITY_LOW) {
+            return when (spanPosition) {
+                CalendarRepository.SpanPosition.SINGLE -> R.drawable.task_chip_low_single
+                CalendarRepository.SpanPosition.START -> R.drawable.task_chip_low_start
+                CalendarRepository.SpanPosition.MIDDLE -> R.drawable.task_chip_low_middle
+                CalendarRepository.SpanPosition.END -> R.drawable.task_chip_low_end
             }
         }
         return when (spanPosition) {
@@ -616,3 +647,5 @@ private class CalendarGridRemoteViewsFactory(
     }
 
 }
+
+
