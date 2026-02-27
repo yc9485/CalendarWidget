@@ -24,7 +24,11 @@ class WidgetActionsActivity : AppCompatActivity() {
         val btnExport = findViewById<Button>(R.id.btnActionsExport)
         val btnManage = findViewById<Button>(R.id.btnActionsManage)
         val btnLanguage = findViewById<Button>(R.id.btnActionsLanguage)
+        val btnSound = findViewById<Button>(R.id.btnActionsSound)
         val btnClose = findViewById<Button>(R.id.btnActionsClose)
+
+        // Update sound button text based on current state
+        updateSoundButtonText(btnSound)
 
         btnImport.setOnClickListener {
             openImportExport(ImportExportActivity.MODE_IMPORT)
@@ -40,8 +44,31 @@ class WidgetActionsActivity : AppCompatActivity() {
             startActivity(Intent(this, LanguageSelectionActivity::class.java))
             finish()
         }
+        btnSound.setOnClickListener {
+            toggleSound(btnSound)
+        }
         btnClose.setOnClickListener {
             finish()
+        }
+    }
+
+    private fun updateSoundButtonText(button: Button) {
+        val isEnabled = SoundManager.isSoundEnabled(this)
+        button.text = if (isEnabled) {
+            getString(R.string.sound_effects_enabled)
+        } else {
+            getString(R.string.sound_effects_disabled)
+        }
+    }
+
+    private fun toggleSound(button: Button) {
+        val currentState = SoundManager.isSoundEnabled(this)
+        SoundManager.setSoundEnabled(this, !currentState)
+        updateSoundButtonText(button)
+        
+        // Play sound if just enabled
+        if (!currentState) {
+            SoundManager.playCompletionSound(this)
         }
     }
 

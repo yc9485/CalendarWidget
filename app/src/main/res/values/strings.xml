@@ -87,4 +87,13 @@
     <string name="language_chinese">中文 (Chinese)</string>
     <string name="language_system_default">System Default</string>
     <string name="language_changed">Language changed. Restarting app...</string>
+    <string name="description_label">Description (optional)</string>
+    <string name="description_hint">Add more details about this task...</string>
+    <string name="add_description">Add Description</string>
+    <string name="edit_description">Edit Description</string>
+    <string name="view_description">View Description</string>
+    <string name="description_title">Task Description</string>
+    <string name="sound_effects">Sound Effects</string>
+    <string name="sound_effects_enabled">Sound effects enabled</string>
+    <string name="sound_effects_disabled">Sound effects disabled</string>
 </resources>

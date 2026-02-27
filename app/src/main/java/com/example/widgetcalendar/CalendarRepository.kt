@@ -331,6 +331,7 @@ object CalendarRepository {
                 JSONObject().apply {
                     put("id", item.id)
                     put("title", item.title)
+                    put("description", item.description)
                     put("startDateMillis", item.startDateMillis)
                     put("endDateMillis", item.endDateMillis)
                     put("hasTime", item.hasTime)
@@ -376,6 +377,7 @@ object CalendarRepository {
                     TodoItem(
                         id = id,
                         title = title,
+                        description = obj.optString("description", ""),
                         startDateMillis = obj.optLong("startDateMillis"),
                         endDateMillis = obj.optLong("endDateMillis"),
                         hasTime = obj.optBoolean("hasTime", false),

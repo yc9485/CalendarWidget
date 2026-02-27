@@ -28,6 +28,7 @@ class EditTodoItemActivity : AppCompatActivity() {
     private var todoId: String? = null
     private var existingCompleted: Boolean = false
     private var existingSourceTag: String = ""
+    private var currentDescription: String = ""
 
     private var startDateMillis: Long = 0L
     private var endDateMillis: Long = 0L
@@ -39,6 +40,7 @@ class EditTodoItemActivity : AppCompatActivity() {
 
     private lateinit var tvDialogTitle: TextView
     private lateinit var etTitle: EditText
+    private lateinit var btnEditDescription: Button
     private lateinit var btnStartDate: Button
     private lateinit var btnEndDate: Button
     private lateinit var spPriority: Spinner
@@ -72,6 +74,7 @@ class EditTodoItemActivity : AppCompatActivity() {
 
         tvDialogTitle = findViewById(R.id.tvDialogTitle)
         etTitle = findViewById(R.id.etTitle)
+        btnEditDescription = findViewById(R.id.btnEditDescription)
         btnStartDate = findViewById(R.id.btnStartDate)
         btnEndDate = findViewById(R.id.btnEndDate)
         spPriority = findViewById(R.id.spPriority)
@@ -88,6 +91,10 @@ class EditTodoItemActivity : AppCompatActivity() {
         bindSelectors()
         initializeState()
         bindStateToViews()
+
+        btnEditDescription.setOnClickListener {
+            showDescriptionDialog()
+        }
 
         btnStartDate.setOnClickListener {
             pickDate(startDateMillis) { picked ->
@@ -166,6 +173,7 @@ class EditTodoItemActivity : AppCompatActivity() {
             endDateMillis = selectedDate
             existingCompleted = false
             existingSourceTag = ""
+            currentDescription = ""
             return
         }
 
@@ -178,10 +186,49 @@ class EditTodoItemActivity : AppCompatActivity() {
         recurrenceUntilMillis = existing.recurrenceUntilMillis
         existingCompleted = existing.completed
         existingSourceTag = existing.sourceTag
+        currentDescription = existing.description
         etTitle.setText(existing.title)
         cbHasTime.isChecked = existing.hasTime
+        
+        // Update button text based on description
+        updateDescriptionButtonText()
     }
-
+    
+    private fun updateDescriptionButtonText() {
+        btnEditDescription.text = if (currentDescription.isBlank()) {
+            getString(R.string.add_description)
+        } else {
+            getString(R.string.edit_description)
+        }
+    }
+    
+    private fun showDescriptionDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_description, null)
+        val etDescription = dialogView.findViewById<EditText>(R.id.etDescriptionDialog)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnDescriptionSave)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnDescriptionCancel)
+        
+        etDescription.setText(currentDescription)
+        etDescription.setSelection(currentDescription.length)
+        
+        val dialog = android.app.AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+        
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        btnSave.setOnClickListener {
+            currentDescription = etDescription.text.toString().trim()
+            updateDescriptionButtonText()
+            dialog.dismiss()
+        }
+        
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+    }
     private fun bindStateToViews() {
         val editingExisting = !todoId.isNullOrBlank()
         tvDialogTitle.setText(
@@ -242,10 +289,11 @@ class EditTodoItemActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.invalid_recurrence_until, Toast.LENGTH_SHORT).show()
             return
         }
-
+        
         val item = TodoItem(
             id = todoId ?: UUID.randomUUID().toString(),
             title = title,
+            description = currentDescription,
             startDateMillis = startDateMillis,
             endDateMillis = endDateMillis,
             hasTime = cbHasTime.isChecked,

@@ -1,6 +1,7 @@
 package com.example.widgetcalendar
 
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -57,6 +59,10 @@ class DateTodosActivity : AppCompatActivity() {
                     CalendarRepository.resolveSeriesItemId(item),
                     checked
                 )
+                // Play sound when marking as complete
+                if (checked) {
+                    SoundManager.playCompletionSound(this)
+                }
                 reloadItems()
                 notifyWidgetChanged()
             },
@@ -131,12 +137,28 @@ private class TodosAdapter(
         val cbDone = view.findViewById<CheckBox>(R.id.cbDone)
         val tvTitle = view.findViewById<TextView>(R.id.tvTodoTitle)
         val tvMeta = view.findViewById<TextView>(R.id.tvTodoMeta)
+        val tvDescription = view.findViewById<TextView>(R.id.tvTodoDescription)
+        val btnViewDescription = view.findViewById<Button>(R.id.btnViewDescription)
         val rowContent = view.findViewById<View>(R.id.todoRowContent)
 
         val item = getItem(position)
 
         tvTitle.text = item.title
         tvMeta.text = CalendarRepository.formatItemMeta(parent.context, item)
+        
+        // Show description preview and button if there's a description
+        if (item.description.isNotBlank()) {
+            tvDescription.text = item.description
+            tvDescription.visibility = View.VISIBLE
+            btnViewDescription.visibility = View.VISIBLE
+            btnViewDescription.setOnClickListener {
+                showDescriptionDialog(parent.context, item.title, item.description)
+            }
+        } else {
+            tvDescription.visibility = View.GONE
+            btnViewDescription.visibility = View.GONE
+        }
+        
         tvTitle.setTextColor(
             if (item.completed) {
                 ContextCompat.getColor(parent.context, R.color.day_text_muted)
@@ -150,6 +172,7 @@ private class TodosAdapter(
         )
         applyStrikeThrough(tvTitle, item.completed)
         applyStrikeThrough(tvMeta, item.completed)
+        applyStrikeThrough(tvDescription, item.completed)
 
         cbDone.setOnCheckedChangeListener(null)
         cbDone.isChecked = item.completed
@@ -171,5 +194,34 @@ private class TodosAdapter(
         } else {
             baseFlags
         }
+    }
+    
+    private fun showDescriptionDialog(context: Context, title: String, description: String) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_description, null)
+        val tvTitle = dialogView.findViewById<TextView>(R.id.tvDescriptionDialogTitle)
+        val etDescription = dialogView.findViewById<EditText>(R.id.etDescriptionDialog)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnDescriptionSave)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnDescriptionCancel)
+        
+        tvTitle.text = title
+        etDescription.setText(description)
+        etDescription.isEnabled = false
+        etDescription.isFocusable = false
+        
+        // Hide save button, only show cancel (close)
+        btnSave.visibility = View.GONE
+        btnCancel.text = context.getString(R.string.close)
+        
+        val dialog = android.app.AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
+        
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
 }

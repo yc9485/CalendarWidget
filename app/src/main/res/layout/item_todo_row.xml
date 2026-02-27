@@ -39,5 +39,30 @@
             android:maxLines="1"
             android:textColor="@color/day_text_muted"
             android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvTodoDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/day_text_primary"
+            android:textSize="11sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnViewDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:backgroundTint="@color/action_button_bg"
+            android:text="@string/view_description"
+            android:textAllCaps="false"
+            android:textColor="@color/action_button_text"
+            android:textSize="9sp"
+            android:minHeight="28dp"
+            android:paddingHorizontal="10dp"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

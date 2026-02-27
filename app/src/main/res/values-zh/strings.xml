@@ -87,4 +87,13 @@
     <string name="language_chinese">中文</string>
     <string name="language_system_default">跟随系统</string>
     <string name="language_changed">语言已更改。正在重启应用...</string>
+    <string name="description_label">描述（可选）</string>
+    <string name="description_hint">添加更多任务详情...</string>
+    <string name="add_description">添加描述</string>
+    <string name="edit_description">编辑描述</string>
+    <string name="view_description">查看描述</string>
+    <string name="description_title">任务描述</string>
+    <string name="sound_effects">音效</string>
+    <string name="sound_effects_enabled">音效已启用</string>
+    <string name="sound_effects_disabled">音效已禁用</string>
 </resources>
