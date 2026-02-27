@@ -66,4 +66,25 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="all_day">All day</string>
+    <string name="repeats_daily">Repeats Daily</string>
+    <string name="repeats_weekly">Repeats Weekly</string>
+    <string name="repeats_monthly">Repeats Monthly</string>
+    <string name="repeats_yearly">Repeats Yearly</string>
+    <string name="repeats_custom">Repeats Custom</string>
+    <string name="repeats_until">Repeats %1$s until %2$s</string>
+    <string name="repeats_format">Repeats %1$s</string>
+    <string name="day_sun">Sun</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="language_settings">Language</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_english">English</string>
+    <string name="language_chinese">中文 (Chinese)</string>
+    <string name="language_system_default">System Default</string>
+    <string name="language_changed">Language changed. Restarting app...</string>
 </resources>

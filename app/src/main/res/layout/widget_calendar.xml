@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Sun"
+            android:text="@string/day_sun"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -108,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Mon"
+            android:text="@string/day_mon"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Tue"
+            android:text="@string/day_tue"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -128,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Wed"
+            android:text="@string/day_wed"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -138,7 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Thu"
+            android:text="@string/day_thu"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Fri"
+            android:text="@string/day_fri"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />
@@ -158,7 +158,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Sat"
+            android:text="@string/day_sat"
             android:textColor="@color/day_text_muted"
             android:textSize="10sp"
             android:textStyle="bold" />

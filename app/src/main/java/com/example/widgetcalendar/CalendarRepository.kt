@@ -265,7 +265,7 @@ object CalendarRepository {
         return String.format(Locale.getDefault(), "%02d:%02d", hour, minutePart)
     }
 
-    fun formatItemMeta(item: TodoItem): String {
+    fun formatItemMeta(context: Context, item: TodoItem): String {
         val datePart = if (dayStart(item.startDateMillis) == dayStart(item.endDateMillis)) {
             formatShortDate(item.startDateMillis)
         } else {
@@ -275,10 +275,10 @@ object CalendarRepository {
         val schedulePart = if (item.hasTime) {
             "${formatMinute(item.startMinute)} - ${formatMinute(item.endMinute)}"
         } else {
-            "All day"
+            context.getString(R.string.all_day)
         }
-        val priorityPart = priorityLabel(item.priority)
-        val recurrencePart = recurrenceLabel(item.recurrence, item.recurrenceUntilMillis)
+        val priorityPart = priorityLabel(context, item.priority)
+        val recurrencePart = recurrenceLabel(context, item.recurrence, item.recurrenceUntilMillis)
         return if (recurrencePart.isBlank()) {
             "$datePart | $schedulePart | $priorityPart"
         } else {
@@ -286,11 +286,11 @@ object CalendarRepository {
         }
     }
 
-    fun priorityLabel(priority: Int): String {
+    fun priorityLabel(context: Context, priority: Int): String {
         return when (normalizePriority(priority)) {
-            PRIORITY_HIGH -> "High"
-            PRIORITY_LOW -> "Low"
-            else -> "Normal"
+            PRIORITY_HIGH -> context.getString(R.string.priority_high)
+            PRIORITY_LOW -> context.getString(R.string.priority_low)
+            else -> context.getString(R.string.priority_normal)
         }
     }
 
@@ -302,21 +302,21 @@ object CalendarRepository {
         }
     }
 
-    fun recurrenceLabel(recurrence: String, recurrenceUntilMillis: Long): String {
+    fun recurrenceLabel(context: Context, recurrence: String, recurrenceUntilMillis: Long): String {
         val type = normalizeRecurrence(recurrence)
         if (type == RECURRENCE_NONE) return ""
         val base = when (type) {
-            RECURRENCE_DAILY -> "Daily"
-            RECURRENCE_WEEKLY -> "Weekly"
-            RECURRENCE_MONTHLY -> "Monthly"
-            RECURRENCE_YEARLY -> "Yearly"
-            else -> "Custom"
+            RECURRENCE_DAILY -> context.getString(R.string.repeats_daily)
+            RECURRENCE_WEEKLY -> context.getString(R.string.repeats_weekly)
+            RECURRENCE_MONTHLY -> context.getString(R.string.repeats_monthly)
+            RECURRENCE_YEARLY -> context.getString(R.string.repeats_yearly)
+            else -> context.getString(R.string.repeats_custom)
         }
         val until = normalizeRecurrenceUntil(recurrenceUntilMillis, 0L)
         return if (until > 0L) {
-            "Repeats $base until ${formatShortDate(until)}"
+            context.getString(R.string.repeats_until, base, formatShortDate(until))
         } else {
-            "Repeats $base"
+            context.getString(R.string.repeats_format, base)
         }
     }
 

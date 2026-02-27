@@ -66,5 +66,8 @@ class ManageCalendarsActivity : AppCompatActivity() {
         cbSweden.text = getString(R.string.manage_sweden_calendar_count, swedenCount)
         tvSummary.text = getString(R.string.manage_summary_total, chinaCount + swedenCount)
     }
-}
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LanguageHelper.applyLanguage(newBase))
+    }
+}

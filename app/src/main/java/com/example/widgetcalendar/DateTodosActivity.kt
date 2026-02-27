@@ -106,6 +106,10 @@ class DateTodosActivity : AppCompatActivity() {
             CalendarWidgetProvider.refreshAllWidgets(this)
         }
     }
+
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LanguageHelper.applyLanguage(newBase))
+    }
 }
 
 private class TodosAdapter(
@@ -132,7 +136,7 @@ private class TodosAdapter(
         val item = getItem(position)
 
         tvTitle.text = item.title
-        tvMeta.text = CalendarRepository.formatItemMeta(item)
+        tvMeta.text = CalendarRepository.formatItemMeta(parent.context, item)
         tvTitle.setTextColor(
             if (item.completed) {
                 ContextCompat.getColor(parent.context, R.color.day_text_muted)
@@ -169,4 +173,3 @@ private class TodosAdapter(
         }
     }
 }
-

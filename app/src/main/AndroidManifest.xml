@@ -46,6 +46,11 @@
             android:exported="false"
             android:theme="@style/Theme.WidgetCalendar.Dialog" />
 
+        <activity
+            android:name=".LanguageSelectionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.WidgetCalendar.Dialog" />
+
         <receiver
             android:name=".CalendarWidgetProvider"
             android:exported="false">

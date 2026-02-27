@@ -215,10 +215,13 @@ class ImportExportActivity : AppCompatActivity() {
         return "widget_calendar_$stamp.ics"
     }
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LanguageHelper.applyLanguage(newBase))
+    }
+
     companion object {
         const val EXTRA_MODE = "extra_import_export_mode"
         const val MODE_IMPORT = "import"
         const val MODE_EXPORT = "export"
     }
 }
-

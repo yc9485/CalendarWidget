@@ -1,0 +1,35 @@
+========================================
+  Widget Calendar - Quick Install Guide
+========================================
+
+APK LOCATION:
+  app/build/outputs/apk/debug/app-debug.apk
+  (5.64 MB)
+
+INSTALLATION STEPS:
+  1. Copy app-debug.apk to your phone
+  2. Enable "Install unknown apps" in Settings
+  3. Tap the APK file to install
+  4. Open the app
+
+TESTING LANGUAGE SWITCHER:
+  1. Long-press home screen → Add Widget Calendar widget
+  2. Tap "..." button on widget
+  3. Select "Language" / "语言"
+  4. Choose: System Default / English / 中文
+  5. App restarts automatically
+
+FEATURES TO TEST:
+  ✓ Language switching (English ↔ Chinese)
+  ✓ Add/edit reminders and todos
+  ✓ Multi-day events
+  ✓ Priority levels
+  ✓ Recurring events
+  ✓ Import/Export calendars
+  ✓ Widget updates
+
+REQUIREMENTS:
+  - Android 8.0 or higher
+  - ~6 MB storage space
+
+ENJOY! 🎉

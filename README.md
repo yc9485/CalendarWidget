@@ -32,3 +32,27 @@ Optional flags:
 - Each item can span multiple days (start/end date range).
 - Each item has a completion checkbox and completed items are shown with strikethrough in the day list.
 - Data is stored locally using `SharedPreferences`.
+
+## Language Support
+
+The app supports multiple languages with both automatic and manual selection:
+- **English** (default)
+- **Chinese** (Simplified & Traditional) - 中文支持
+
+### Automatic Language Detection
+The app automatically displays in your device's language.
+
+### Manual Language Selection (New!)
+You can also change the language directly in the app:
+1. Tap the "..." button on the widget
+2. Select "Language" / "语言"
+3. Choose your preferred language:
+   - System Default (follows device settings)
+   - English
+   - 中文 (Chinese)
+4. App will restart automatically with the new language
+
+For more details, see:
+- [CHINESE_LOCALIZATION.md](CHINESE_LOCALIZATION.md) - Translation implementation
+- [IN_APP_LANGUAGE_SWITCHER.md](IN_APP_LANGUAGE_SWITCHER.md) - Language switcher feature
+

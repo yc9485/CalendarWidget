@@ -23,6 +23,7 @@ class WidgetActionsActivity : AppCompatActivity() {
         val btnImport = findViewById<Button>(R.id.btnActionsImport)
         val btnExport = findViewById<Button>(R.id.btnActionsExport)
         val btnManage = findViewById<Button>(R.id.btnActionsManage)
+        val btnLanguage = findViewById<Button>(R.id.btnActionsLanguage)
         val btnClose = findViewById<Button>(R.id.btnActionsClose)
 
         btnImport.setOnClickListener {
@@ -33,6 +34,10 @@ class WidgetActionsActivity : AppCompatActivity() {
         }
         btnManage.setOnClickListener {
             startActivity(Intent(this, ManageCalendarsActivity::class.java))
+            finish()
+        }
+        btnLanguage.setOnClickListener {
+            startActivity(Intent(this, LanguageSelectionActivity::class.java))
             finish()
         }
         btnClose.setOnClickListener {
@@ -49,5 +54,8 @@ class WidgetActionsActivity : AppCompatActivity() {
         )
         finish()
     }
-}
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LanguageHelper.applyLanguage(newBase))
+    }
+}

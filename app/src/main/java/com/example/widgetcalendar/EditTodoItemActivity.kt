@@ -383,5 +383,8 @@ class EditTodoItemActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
     }
-}
 
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(LanguageHelper.applyLanguage(newBase))
+    }
+}
