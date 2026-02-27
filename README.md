@@ -24,14 +24,30 @@ Optional flags:
 - `-SkipSdkInstall` if SDK packages are already installed.
 - `-BuildOnly` to only create APK and skip `adb install`.
 
-## Notes
+## Features
 
-- The widget supports previous/next month navigation.
-- Multiple items can be stored under the same day.
-- Each item can have an optional specific time period.
-- Each item can span multiple days (start/end date range).
-- Each item has a completion checkbox and completed items are shown with strikethrough in the day list.
-- Data is stored locally using `SharedPreferences`.
+### Core Functionality
+- Previous/next month navigation
+- Multiple items per day
+- Optional time periods for each item
+- Multi-day task spanning (start/end date range)
+- Task completion checkbox with strikethrough display
+- Local data storage using `SharedPreferences`
+
+### Task Management
+- **Task Descriptions**: Add detailed descriptions to any task (up to 500 characters)
+  - Short descriptions show preview in task list
+  - Longer descriptions accessible via "View Description" button
+  - Edit descriptions anytime via popup dialog
+- **Priority Levels**: Set task priority (Low, Normal, High)
+- **Recurrence**: Set recurring tasks (Daily, Weekly, Monthly, Yearly)
+
+### User Experience
+- **Completion Sound**: Cheerful upward SMS ringtone plays when marking tasks complete
+  - Bright C6 → E6 → G6 melody
+  - Toggle sound on/off in widget menu
+  - Enabled by default
+- **Standardized UI**: Consistent button sizes across all dialogs for better visual harmony
 
 ## Language Support
 
@@ -55,4 +71,15 @@ You can also change the language directly in the app:
 For more details, see:
 - [CHINESE_LOCALIZATION.md](CHINESE_LOCALIZATION.md) - Translation implementation
 - [IN_APP_LANGUAGE_SWITCHER.md](IN_APP_LANGUAGE_SWITCHER.md) - Language switcher feature
+- [TASK_DESCRIPTION_FEATURE.md](TASK_DESCRIPTION_FEATURE.md) - Task description feature
+- [COMPLETION_SOUND_FEATURE.md](COMPLETION_SOUND_FEATURE.md) - Completion sound implementation
+
+## Widget Menu
+
+Access additional features by tapping the "..." button on the widget:
+- **Import/Export**: Backup and restore your tasks via ICS calendar files
+- **Manage Calendars**: Organize tasks into different calendars
+- **Language**: Switch between System Default, English, or Chinese
+- **Sound Effects**: Toggle completion sound on/off
+
 
