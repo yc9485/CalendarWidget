@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Widget Calendar</string>
+    <string name="app_name">Monthly Calendar Widget</string>
     <string name="main_title">Widget Calendar is ready</string>
     <string name="main_body">Long-press your home screen, add the Widget Calendar widget, then tap any date to manage reminders and todos with time ranges, completion, and multi-day spans.</string>
     <string name="previous_month">Previous month</string>
