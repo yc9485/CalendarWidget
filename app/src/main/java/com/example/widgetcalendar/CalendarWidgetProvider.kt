@@ -1,5 +1,6 @@
 package com.example.widgetcalendar
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -9,6 +10,7 @@ import android.content.Intent
 import android.os.Build
 import android.net.Uri
 import android.widget.RemoteViews
+import java.util.Calendar
 
 class CalendarWidgetProvider : AppWidgetProvider() {
 
@@ -18,6 +20,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         appWidgetIds.forEach { updateWidget(context, appWidgetManager, it) }
+        scheduleMidnightAlarm(context)
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
@@ -112,12 +115,18 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 }
             }
 
+            ACTION_MIDNIGHT_ALARM -> {
+                refreshAllWidgets(context)
+                scheduleMidnightAlarm(context)
+            }
+
             ACTION_REMINDER_CHANGED,
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_DATE_CHANGED,
             Intent.ACTION_TIME_CHANGED,
             Intent.ACTION_TIMEZONE_CHANGED -> {
                 refreshAllWidgets(context)
+                scheduleMidnightAlarm(context)
             }
         }
     }
@@ -131,7 +140,9 @@ class CalendarWidgetProvider : AppWidgetProvider() {
         const val ACTION_EXPORT = "com.example.widgetcalendar.EXPORT"
         const val ACTION_DATE_CLICK = "com.example.widgetcalendar.DATE_CLICK"
         const val ACTION_REMINDER_CHANGED = "com.example.widgetcalendar.REMINDER_CHANGED"
+        const val ACTION_MIDNIGHT_ALARM = "com.example.widgetcalendar.MIDNIGHT_ALARM"
         const val EXTRA_DATE_MILLIS = "extra_date_millis"
+        private const val REQUEST_CODE_MIDNIGHT_ALARM = 9999
 
         fun refreshAllWidgets(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
@@ -227,6 +238,27 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
             )
+        }
+
+        fun scheduleMidnightAlarm(context: Context) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, CalendarWidgetProvider::class.java).apply {
+                action = ACTION_MIDNIGHT_ALARM
+            }
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                REQUEST_CODE_MIDNIGHT_ALARM,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val nextMidnight = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.timeInMillis
+            alarmManager.set(AlarmManager.RTC, nextMidnight, pendingIntent)
         }
     }
 }

@@ -68,6 +68,7 @@
                 <action android:name="com.example.widgetcalendar.EXPORT" />
                 <action android:name="com.example.widgetcalendar.DATE_CLICK" />
                 <action android:name="com.example.widgetcalendar.REMINDER_CHANGED" />
+                <action android:name="com.example.widgetcalendar.MIDNIGHT_ALARM" />
             </intent-filter>
 
             <meta-data
