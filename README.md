@@ -1,4 +1,4 @@
-# Widget Calendar (Android)
+# Monthly Calendar Widget (Android)
 
 Home-screen monthly calendar widget where each date is clickable.  
 Tap a date to manage reminders/todos and the brief status appears on each date cell in the widget.
