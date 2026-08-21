@@ -1,4 +1,4 @@
-package com.example.widgetcalendar
+﻿package com.example.widgetcalendar
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -22,7 +22,9 @@ class CalendarGridRemoteViewsService : RemoteViewsService() {
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
-        return CalendarGridRemoteViewsFactory(applicationContext, widgetId)
+        // Apply the user-selected language so all text in the grid uses the right locale
+        val ctx = LanguageHelper.applyLanguage(applicationContext)
+        return CalendarGridRemoteViewsFactory(ctx, widgetId)
     }
 }
 
@@ -245,7 +247,7 @@ private class CalendarGridRemoteViewsFactory(
             .sortedWith(
                 compareBy<TodoItem>(
                     { CalendarRepository.dayStart(it.startDateMillis) },
-                    { CalendarRepository.dayStart(it.endDateMillis) },
+                    { -CalendarRepository.calendarDaysBetween(it.startDateMillis, it.endDateMillis) },
                     { it.id }
                 )
             )
@@ -254,6 +256,7 @@ private class CalendarGridRemoteViewsFactory(
         multiItems.forEach { item ->
             val rawStartIndex = dayIndex(item.startDateMillis, visibleStart)
             val rawEndIndex = dayIndex(item.endDateMillis, visibleStart)
+            if (rawEndIndex < 0 || rawStartIndex > lastIndex) return@forEach
             val startIndex = rawStartIndex.coerceIn(0, lastIndex)
             val endIndex = rawEndIndex.coerceIn(0, lastIndex)
             val interval = startIndex..endIndex
@@ -279,8 +282,7 @@ private class CalendarGridRemoteViewsFactory(
     }
 
     private fun dayIndex(timeMillis: Long, visibleStart: Long): Int {
-        val dayMs = 86_400_000L
-        return ((CalendarRepository.dayStart(timeMillis) - visibleStart) / dayMs).toInt()
+        return CalendarRepository.calendarDaysBetween(visibleStart, timeMillis)
     }
 
     private fun buildLineForDay(
@@ -647,5 +649,3 @@ private class CalendarGridRemoteViewsFactory(
     }
 
 }
-
-

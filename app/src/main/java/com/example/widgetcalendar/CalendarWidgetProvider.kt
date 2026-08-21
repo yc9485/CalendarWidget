@@ -161,11 +161,11 @@ class CalendarWidgetProvider : AppWidgetProvider() {
             appWidgetManager: AppWidgetManager,
             appWidgetId: Int
         ) {
+            // Apply the user-selected language so month names format correctly
+            val ctx = LanguageHelper.applyLanguage(context)
             val views = RemoteViews(context.packageName, R.layout.widget_calendar)
-            views.setTextViewText(
-                R.id.tvMonthTitle,
-                CalendarRepository.getDisplayedMonthTitle(context, appWidgetId)
-            )
+            val monthTitle = CalendarRepository.getDisplayedMonthTitle(ctx, appWidgetId)
+            views.setTextViewText(R.id.tvMonthTitle, monthTitle)
 
             val serviceIntent = Intent(context, CalendarGridRemoteViewsService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
