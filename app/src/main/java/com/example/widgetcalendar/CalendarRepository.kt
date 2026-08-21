@@ -63,6 +63,44 @@ object CalendarRepository {
         }.timeInMillis
     }
 
+    fun calendarDaysBetween(startMillis: Long, endMillis: Long): Int {
+        val start = Calendar.getInstance().apply {
+            timeInMillis = dayStart(startMillis)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val end = Calendar.getInstance().apply {
+            timeInMillis = dayStart(endMillis)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        var count = 0
+        while (start.before(end)) {
+            start.add(Calendar.DAY_OF_MONTH, 1)
+            count++
+        }
+        while (start.after(end)) {
+            start.add(Calendar.DAY_OF_MONTH, -1)
+            count--
+        }
+        return count
+    }
+
+    fun addCalendarDays(baseMillis: Long, days: Int): Long {
+        return Calendar.getInstance().apply {
+            timeInMillis = dayStart(baseMillis)
+            add(Calendar.DAY_OF_MONTH, days)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
     fun getAllTodoItems(context: Context): List<TodoItem> {
         val raw = prefs(context).getString(TODO_ITEMS_KEY, "[]") ?: "[]"
         return parseTodoItems(raw).sortedWith(todoComparator())
@@ -119,8 +157,8 @@ object CalendarRepository {
                 return@forEach
             }
 
-            val durationDays = ((dayStart(item.endDateMillis) - dayStart(item.startDateMillis)) / DAY_MS)
-                .coerceAtLeast(0L)
+            val durationDays = calendarDaysBetween(item.startDateMillis, item.endDateMillis)
+                .coerceAtLeast(0)
             val recurrenceLimit = normalizeRecurrenceUntil(item.recurrenceUntilMillis, dayStart(item.startDateMillis))
             var occurrenceStart = dayStart(item.startDateMillis)
             var iterations = 0
@@ -130,7 +168,7 @@ object CalendarRepository {
                 (recurrenceLimit <= 0L || occurrenceStart <= recurrenceLimit) &&
                 iterations < MAX_RECURRENCE_ITERATIONS
             ) {
-                val occurrenceEnd = occurrenceStart + durationDays * DAY_MS
+                val occurrenceEnd = addCalendarDays(occurrenceStart, durationDays)
                 if (occurrenceEnd >= rangeStart) {
                     expanded += buildOccurrence(item, occurrenceStart, occurrenceEnd)
                 }
@@ -467,8 +505,8 @@ object CalendarRepository {
 
     private fun nextOccurrenceStart(currentStartDay: Long, recurrence: String): Long {
         return when (recurrence) {
-            RECURRENCE_DAILY -> currentStartDay + DAY_MS
-            RECURRENCE_WEEKLY -> currentStartDay + DAY_MS * 7L
+            RECURRENCE_DAILY -> addCalendarDays(currentStartDay, 1)
+            RECURRENCE_WEEKLY -> addCalendarDays(currentStartDay, 7)
             RECURRENCE_MONTHLY -> Calendar.getInstance().apply {
                 timeInMillis = currentStartDay
                 add(Calendar.MONTH, 1)

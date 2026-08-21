@@ -63,7 +63,7 @@ object IcsCalendarCodec {
                 builder.append("DTEND:${dateTimeLocal.format(endMs)}\r\n")
             } else {
                 builder.append("DTSTART;VALUE=DATE:${dateOnly.format(startDay)}\r\n")
-                val endExclusive = endDay + 86_400_000L
+                val endExclusive = CalendarRepository.addCalendarDays(endDay, 1)
                 builder.append("DTEND;VALUE=DATE:${dateOnly.format(endExclusive)}\r\n")
             }
             builder.append("END:VEVENT\r\n")
@@ -120,7 +120,7 @@ object IcsCalendarCodec {
 
         return if (startIsDateOnly) {
             val startDay = parseDateOnly(dtStart.value) ?: return null
-            val endDay = dtEnd?.value?.let { parseDateOnly(it)?.minus(86_400_000L) } ?: startDay
+            val endDay = dtEnd?.value?.let { parseDateOnly(it)?.let { d -> CalendarRepository.addCalendarDays(d, -1) } } ?: startDay
             TodoItem(
                 id = id,
                 title = CalendarRepository.normalizeTitle(summary),

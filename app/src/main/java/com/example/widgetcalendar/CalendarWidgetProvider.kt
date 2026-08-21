@@ -37,6 +37,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID
                 )
+                android.util.Log.d("WidgetCalendar", "ACTION_PREV_MONTH: widgetId=$widgetId")
                 if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                     CalendarRepository.shiftMonthOffset(context, widgetId, -1)
                     updateWidget(context, appWidgetManager, widgetId)
@@ -48,6 +49,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                     AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID
                 )
+                android.util.Log.d("WidgetCalendar", "ACTION_NEXT_MONTH: widgetId=$widgetId")
                 if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
                     CalendarRepository.shiftMonthOffset(context, widgetId, 1)
                     updateWidget(context, appWidgetManager, widgetId)
@@ -165,6 +167,7 @@ class CalendarWidgetProvider : AppWidgetProvider() {
             val ctx = LanguageHelper.applyLanguage(context)
             val views = RemoteViews(context.packageName, R.layout.widget_calendar)
             val monthTitle = CalendarRepository.getDisplayedMonthTitle(ctx, appWidgetId)
+            android.util.Log.d("WidgetCalendar", "updateWidget: widgetId=$appWidgetId, monthTitle='$monthTitle'")
             views.setTextViewText(R.id.tvMonthTitle, monthTitle)
 
             val serviceIntent = Intent(context, CalendarGridRemoteViewsService::class.java).apply {
@@ -195,8 +198,8 @@ class CalendarWidgetProvider : AppWidgetProvider() {
                 dateClickTemplatePendingIntent(context, appWidgetId)
             )
 
-            appWidgetManager.updateAppWidget(appWidgetId, views)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.gridCalendar)
+            appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
         private fun monthNavPendingIntent(

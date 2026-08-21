@@ -22,19 +22,28 @@ android {
         versionName = "1.0"
     }
 
+    val hasSigning = localProps.containsKey("KEYSTORE_PATH") &&
+        localProps.containsKey("KEYSTORE_PASSWORD") &&
+        localProps.containsKey("KEY_ALIAS") &&
+        localProps.containsKey("KEY_PASSWORD")
+
     signingConfigs {
-        create("release") {
-            storeFile = file(localProps["KEYSTORE_PATH"] as String)
-            storePassword = localProps["KEYSTORE_PASSWORD"] as String
-            keyAlias = localProps["KEY_ALIAS"] as String
-            keyPassword = localProps["KEY_PASSWORD"] as String
+        if (hasSigning) {
+            create("release") {
+                storeFile = file(localProps["KEYSTORE_PATH"] as String)
+                storePassword = localProps["KEYSTORE_PASSWORD"] as String
+                keyAlias = localProps["KEY_ALIAS"] as String
+                keyPassword = localProps["KEY_PASSWORD"] as String
+            }
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            if (hasSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -56,4 +65,5 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
+    testImplementation("junit:junit:4.13.2")
 }
